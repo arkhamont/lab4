@@ -1,0 +1,7 @@
+[ Thu Jun 02 09:57:42 MSK 2022 ] 1
+[ Thu Jun 02 09:59:20 MSK 2022 ] 1
+[ Thu Jun 02 09:59:28 MSK 2022 ] 2
+[ Thu Jun 02 09:59:58 MSK 2022 ] 1 2 1 345
+[ Thu Jun 02 10:00:16 MSK 2022 ] exit
+[ Thu Jun 02 10:00:16 MSK 2022 ] null
+[ Thu Jun 02 10:06:34 MSK 2022 ] 1
