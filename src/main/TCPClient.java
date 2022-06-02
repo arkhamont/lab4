@@ -1,6 +1,5 @@
 package main;
 
-import jdk.swing.interop.SwingInterOpUtils;
 
 import java.io.*;
 import java.net.*;
@@ -8,12 +7,12 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class TCPClient implements Runnable {
-    private static int PORT;
-    private static String HOST;
-    private static BufferedReader in= null; // поток чтения из сокета
-    private static BufferedWriter out = null; // поток записи в сокет
+    private  int PORT;
+    private  String HOST;
+    private  BufferedReader in = null;
+    private  BufferedWriter out = null;
     private String message = null;
-    private static String fileName = null;
+    private String fileName = null;
 
     public void sendMessage(String message) throws IOException {
         out.write(message + '\n');
@@ -45,9 +44,12 @@ public class TCPClient implements Runnable {
     }
     public void run(){
         try{
+            Scanner sc = new Scanner(System.in);
+            System.out.println("Введите путь к файлу журнала:");
+            fileName = sc.nextLine();
+
             System.out.println(HOST + "  " +PORT);
             Socket socket = new Socket(HOST, PORT);
-            Scanner sc = new Scanner(System.in);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             System.out.println("Добро пожаловать");
@@ -121,10 +123,6 @@ public class TCPClient implements Runnable {
     }
     public static void main(String[] args) {
         String[] ip_data = args[0].split(":");
-
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Введите путь к файлу журнала:");
-        fileName = sc.nextLine();
 
         TCPClient ja = new TCPClient(ip_data[0], Integer.parseInt(ip_data[1]));
         Thread th = new Thread(ja);

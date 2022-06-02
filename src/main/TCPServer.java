@@ -9,8 +9,6 @@ import java.util.Date;
 public class TCPServer {
     public static int PORT = Integer.parseInt(Properties.getProperty(Properties.HOST));
     private ServerSocket servSocket = null;
-    private static BufferedReader in = null; // поток чтения из сокета
-    private static BufferedWriter out = null; // поток записи в сокет
     private String fileName = Properties.getProperty(Properties.LOG_FILE);
     private  int intArr[][] = {
             {1,2,3,4,5},
@@ -50,12 +48,12 @@ public class TCPServer {
         }catch(IOException e){throw new RuntimeException();}
     }
 
-    public void sendMessage(String message) throws IOException {
+    public void sendMessage(BufferedWriter out, String message) throws IOException {
         out.write(message + '\n');
         out.flush();
     }
 
-    public String readMessage() throws IOException {
+    public String readMessage(BufferedReader in) throws IOException {
         String message = in.readLine();
         fileWriter(fileName,message);
         return message;
@@ -123,13 +121,15 @@ public class TCPServer {
             }
             public void run(){
                 try{
+                    BufferedReader in = null; // поток чтения из сокета
+                    BufferedWriter out = null; // поток записи в сокет
                     System.out.println("Клиент подключился");
                     int count = 0;
                     in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                     String read_message;
                     while(true) {
-                        read_message = readMessage();
+                        read_message = readMessage(in);
                         System.out.println("Выполняется действие: " + read_message);
                         if (read_message.equals("1")) {
                             String int_Arr = "";
@@ -139,7 +139,7 @@ public class TCPServer {
                                 }
                                 int_Arr += ";";
                             }
-                            sendMessage(int_Arr);
+                            sendMessage(out, int_Arr);
 
                             String double_Arr = "";
                             for (int i = 0; i < floatArr.length; i++){
@@ -148,7 +148,7 @@ public class TCPServer {
                                 }
                                 double_Arr += ";";
                             }
-                            sendMessage(double_Arr);
+                            sendMessage(out, double_Arr);
 
                             String string_Arr = "";
                             for (int i = 0; i < stringArr.length; i++){
@@ -157,13 +157,13 @@ public class TCPServer {
                                 }
                                 string_Arr += ";";
                             }
-                            sendMessage(string_Arr);
+                            sendMessage(out, string_Arr);
                         }
                         else {
                             System.out.println("Жду сообщение с индексом");
-                            String index[] = readMessage().split(" ");
-                            for (String in: index) {
-                                System.out.println(in);
+                            String index[] = readMessage(in).split(" ");
+                            for (String ind: index) {
+                                System.out.println(ind);
                             }
                             try {
                                 if(!(findForbiddenIndexes(index[0] + index[1] + index[2]))) {
@@ -173,25 +173,25 @@ public class TCPServer {
                                         System.out.println("Изменяю первый массив");
                                         intArr[ind_i][ind_j] = Integer.parseInt(index[3]);
                                         showArrays();
-                                        sendMessage("OK");
+                                        sendMessage(out, "OK");
                                     } else if (index[0].equals("2")) {
                                         System.out.println("Изменяю второй массив");
                                         floatArr[ind_i][ind_j] = Double.parseDouble(index[3]);
                                         showArrays();
-                                        sendMessage("OK");
+                                        sendMessage(out, "OK");
                                     } else if (index[0].equals("3")) {
                                         System.out.println("Изменяю третий массив");
                                         stringArr[ind_i][ind_j] = index[3];
                                         showArrays();
-                                        sendMessage("OK");
+                                        sendMessage(out, "OK");
                                     } else
-                                        sendMessage("ERROR");
+                                        sendMessage(out, "ERROR");
                                 }
                                 else
-                                    sendMessage("FORBIDDEN");
+                                    sendMessage(out, "FORBIDDEN");
                             }
                             catch(NumberFormatException e){
-                                sendMessage("ERROR");
+                                sendMessage(out, "ERROR");
                             }
                         }
                     }
